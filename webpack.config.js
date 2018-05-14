@@ -25,33 +25,59 @@ const path = require('path');
 //console.log(path.join(__dirname, 'public'));
 //console.log(__dirname);
 
-module.exports = {
-    entry: './src/app.js',
-    output: {
-        path: path.join(__dirname,'public'),
-        filename: 'bundle.js'
-    },
-    module: {
-        rules: [{
-            loader: 'babel-loader',
-            test: /\.js$/,
-            exclude: /node_modules/
-        }, {
-            test: /\.s?css$/,
-            use: [
-                'style-loader',
-                'css-loader',
-                'sass-loader'
-            ]
-        }]
+//Helps webpack extract css
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CSSExtract = new ExtractTextPlugin('styles.css');
 
-    },
-    devtool: 'cheap-module-eval-source-map',
-    devServer: {
-        contentBase: path.join(__dirname,'public'),
-        historyApiFallback: true
-    }
+
+module.exports = (env) => {
+    //check if we are in production
+    const isProduction = env == 'production';
+    
+    return {
+        entry: './src/app.js',
+        output: {
+            path: path.join(__dirname,'public'),
+            filename: 'bundle.js'
+        },
+        module: {
+            rules: [{
+                loader: 'babel-loader',
+                test: /\.js$/,
+                exclude: /node_modules/
+            }, {
+                //Extract css file away from bundle.js into it's own file
+                test: /\.s?css$/,
+                use: CSSExtract.extract({
+                    use: [
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                sourceMap: true
+                            }
+                        },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true
+                        }
+                    },
+                    ]
+                })
+            }]
+
+        },
+        plugins: [
+            CSSExtract
+        ],
+        devtool: isProduction ? 'source-map' : 'inline-source-map',
+        devServer: {
+            contentBase: path.join(__dirname,'public'),
+            historyApiFallback: true
+        }
+    };
 };
+
 
 
 // ***** Getting Started with Babel ****
