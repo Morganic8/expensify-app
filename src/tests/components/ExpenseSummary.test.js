@@ -5,13 +5,13 @@ import expenses from '../fixtures/expenses';
 
 
 test('should render Expense summary with expenses', () => {
-    const wrapper = shallow(<ExpenseSummary expenses={expenses}/>)
+    const wrapper = shallow(<ExpenseSummary expenseCount={1} expensesTotal={235}/>)
 
     expect(wrapper).toMatchSnapshot();
 });
 
-test('should render Expense summary without expenses', () => {
-    const wrapper = shallow(<ExpenseSummary expenses={[]}/>)
+test('should render Expense summary with multiple expenses', () => {
+    const wrapper = shallow(<ExpenseSummary expenseCount={23} expensesTotal={23642363265}/>)
 
     expect(wrapper).toMatchSnapshot();
 });
