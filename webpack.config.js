@@ -22,12 +22,22 @@
 // path.join-- node.js  joins the paths
 
 const path = require('path');
+const webpack = require('webpack');
 //console.log(path.join(__dirname, 'public'));
 //console.log(__dirname);
 
 //Helps webpack extract css
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CSSExtract = new ExtractTextPlugin('styles.css');
+
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+if(process.env.NODE_ENV === 'test'){
+    require('dotenv').config({ path: '.env.test'})
+} else if (process.env.NODE_ENV === 'development') {
+    require('dotenv').config({ path: '.env.development'})
+}
 
 
 module.exports = (env) => {
@@ -68,7 +78,15 @@ module.exports = (env) => {
 
         },
         plugins: [
-            CSSExtract
+            CSSExtract,
+            new webpack.DefinePlugin({
+                'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
+                'process.env.FIREBASE_API_AUTH_DOMAIN': JSON.stringify(process.env.FIREBASE_API_AUTH_DOMAIN),
+                'process.env.FIREBASE_API_DATABASE_URL': JSON.stringify(process.env.FIREBASE_API_DATABASE_URL),
+                'process.env.FIREBASE_API_PROJECT_ID': JSON.stringify(process.env.FIREBASE_API_PROJECT_ID),
+                'process.env.FIREBASE_API_STORAGE_BUCKET': JSON.stringify(process.env.FIREBASE_API_STORAGE_BUCKET),
+                'process.env.FIREBASE_API_MESSAGING_SENDER_ID': JSON.stringify(process.env.FIREBASE_API_MESSAGING_SENDER_ID),
+            })
         ],
         devtool: isProduction ? 'source-map' : 'inline-source-map',
         devServer: {
